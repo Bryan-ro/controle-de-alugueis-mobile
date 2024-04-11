@@ -1,6 +1,12 @@
-import { StyleSheet, Text, View, TouchableOpacity, TextInput } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, Alert } from "react-native";
 import { useFonts, Nunito_200ExtraLight, Nunito_300Light, Nunito_800ExtraBold } from "@expo-google-fonts/nunito";
 import {useState} from "react";
+
+import firebase from "./firebase";
+import { signInWithEmailAndPassword, getAuth, sendPasswordResetEmail, getIdTokenResult } from "firebase/auth";
+
+
+const auth = getAuth(firebase);
 
 export default function Login () {
     const [email, setEmail] = useState("");
@@ -17,10 +23,21 @@ export default function Login () {
     }
 
 
+    async function getCredential () {
+        try {
+            const credential = await signInWithEmailAndPassword(auth, email, password);
+
+            console.log(credential.user.getIdToken())
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+
     return (
         <View style={style.background}>
             <View style={style.container}>
-                <Text style={style.title}>Seja bem vindo!</Text>
+                <Text style={style.title}>Seja bem-vindo!</Text>
                 
                 <View style={style.form}>
                     <View style={style.inputView}>
@@ -33,7 +50,7 @@ export default function Login () {
                         <TextInput style={style.input} secureTextEntry={true} onChangeText={(text) => {setPassword(text)}}/>
                     </View>
 
-                    <TouchableOpacity style={style.button} onPress={() => {console.log(password)}}>
+                    <TouchableOpacity style={style.button} onPress={() => {getCredential()}}>
                         <Text style={style.buttonText}>Entrar</Text>
                     </TouchableOpacity>
                 </View>
