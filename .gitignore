@@ -35,4 +35,4 @@ yarn-error.*
 *.tsbuildinfo
 
 # sensitive files
-/src/app/firebase/index.js
+/src/firebase/index.js

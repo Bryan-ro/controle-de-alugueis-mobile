@@ -1,56 +1,59 @@
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, Alert } from "react-native";
 import { useFonts, Nunito_200ExtraLight, Nunito_300Light, Nunito_800ExtraBold } from "@expo-google-fonts/nunito";
-import {useState} from "react";
+import { useState, useContext } from "react";
 
-import firebase from "./firebase";
-import { signInWithEmailAndPassword, getAuth, sendPasswordResetEmail, getIdTokenResult } from "firebase/auth";
+import firebase from "../firebase";
+import { signInWithEmailAndPassword, getAuth, sendPasswordResetEmail } from "firebase/auth";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const auth = getAuth(firebase);
 
-export default function Login () {
+export default function Login({ navigation }) {
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [password, setPassword] = useState("")
 
     const [fontLoaded] = useFonts({
-        Nunito_200ExtraLight, 
+        Nunito_200ExtraLight,
         Nunito_300Light,
         Nunito_800ExtraBold
     });
 
-    if(!fontLoaded) {
+    if (!fontLoaded) {
         return null;
     }
 
-
-    async function getCredential () {
+    navigation.navigate("Teste")
+    async function getCredential() {
         try {
-            const credential = await signInWithEmailAndPassword(auth, email, password);
+            const user = await signInWithEmailAndPassword(auth, email, password);
 
-            console.log(credential.user.getIdToken())
+            await AsyncStorage.setItem("userData", JSON.stringify(user));
+
+
         } catch (error) {
             console.log(error)
+            Alert.alert("Tente novamente!", "O usuário ou senha inseridos, são inválidos.")
         }
     }
-
 
     return (
         <View style={style.background}>
             <View style={style.container}>
                 <Text style={style.title}>Seja bem-vindo!</Text>
-                
+
                 <View style={style.form}>
                     <View style={style.inputView}>
                         <Text style={style.label}>E-mail</Text>
-                        <TextInput style={style.input} keyboardType="email-address" onChangeText={(text) => {setEmail(text)}}/>
+                        <TextInput style={style.input} keyboardType="email-address" onChangeText={(text) => { setEmail(text) }} />
                     </View>
 
                     <View style={style.inputView}>
                         <Text style={style.label}>Senha</Text>
-                        <TextInput style={style.input} secureTextEntry={true} onChangeText={(text) => {setPassword(text)}}/>
+                        <TextInput style={style.input} secureTextEntry={true} onChangeText={(text) => { setPassword(text) }} />
                     </View>
 
-                    <TouchableOpacity style={style.button} onPress={() => {getCredential()}}>
+                    <TouchableOpacity style={style.button} onPress={() => { getCredential() }}>
                         <Text style={style.buttonText}>Entrar</Text>
                     </TouchableOpacity>
                 </View>
@@ -70,7 +73,7 @@ const style = StyleSheet.create({
         height: "100%",
         display: "flex",
         justifyContent: "space-around"
-    },  
+    },
 
     title: {
         color: "white",
@@ -100,7 +103,7 @@ const style = StyleSheet.create({
     },
 
     input: {
-        backgroundColor: "white", 
+        backgroundColor: "white",
         fontFamily: "Nunito_300Light",
         fontSize: 18,
         paddingVertical: 8,
@@ -109,7 +112,7 @@ const style = StyleSheet.create({
     },
 
     button: {
-        backgroundColor: "#0ca7ff", 
+        backgroundColor: "#0ca7ff",
         paddingVertical: 8,
         paddingHorizontal: 15,
         borderRadius: 30,
