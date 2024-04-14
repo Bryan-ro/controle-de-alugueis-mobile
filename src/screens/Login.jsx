@@ -1,17 +1,21 @@
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, Alert } from "react-native";
 import { useFonts, Nunito_200ExtraLight, Nunito_300Light, Nunito_800ExtraBold } from "@expo-google-fonts/nunito";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 
-import firebase from "../firebase";
+import firebase from "../firebaseConfig";
 import { signInWithEmailAndPassword, getAuth, sendPasswordResetEmail } from "firebase/auth";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { LoginContext } from "../context/LoginContext";
 
 const auth = getAuth(firebase);
 
 export default function Login({ navigation }) {
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("")
+    const [password, setPassword] = useState("");
+
+    const loginStatus = useContext(LoginContext);
 
     const [fontLoaded] = useFonts({
         Nunito_200ExtraLight,
@@ -23,17 +27,29 @@ export default function Login({ navigation }) {
         return null;
     }
 
-    navigation.navigate("Teste")
     async function getCredential() {
         try {
             const user = await signInWithEmailAndPassword(auth, email, password);
 
             await AsyncStorage.setItem("userData", JSON.stringify(user));
 
-
+            loginStatus.updateLogin(true);
+            console.log(loginStatus.login)
         } catch (error) {
-            console.log(error)
             Alert.alert("Tente novamente!", "O usuário ou senha inseridos, são inválidos.")
+        }
+    }
+
+    async function forgotPassword() {
+        try {
+            await sendPasswordResetEmail(auth, email);
+
+            Alert.alert("Solicitação enviada com sucesso", "Verifique a caixa de entrada e spam no seu e-mail.");
+        } catch (error) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailRegex.test(email)) Alert.alert("E-mail inválido", "O campo e-mail está vázio ou é inválido.");
+            else Alert.alert("Erro desconhecido", "Tente novamente mais tarde");
         }
     }
 
@@ -51,6 +67,8 @@ export default function Login({ navigation }) {
                     <View style={style.inputView}>
                         <Text style={style.label}>Senha</Text>
                         <TextInput style={style.input} secureTextEntry={true} onChangeText={(text) => { setPassword(text) }} />
+
+                        <Text style={style.forgotPass} onPress={() => forgotPassword()}>Esqueci minha senha</Text>
                     </View>
 
                     <TouchableOpacity style={style.button} onPress={() => { getCredential() }}>
@@ -79,7 +97,7 @@ const style = StyleSheet.create({
         color: "white",
         fontSize: 32,
         fontFamily: "Nunito_800ExtraBold",
-        padding: 10
+        textAlign: "center"
     },
 
     form: {
@@ -109,6 +127,13 @@ const style = StyleSheet.create({
         paddingVertical: 8,
         paddingHorizontal: 15,
         borderRadius: 30
+    },
+
+    forgotPass: {
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        fontFamily: "Nunito_800ExtraBold",
+        color: "white"
     },
 
     button: {

@@ -1,4 +1,4 @@
-import Router from './src/routers';
+import Router from './src/router';
 
 import { StatusBar } from 'react-native';
 
