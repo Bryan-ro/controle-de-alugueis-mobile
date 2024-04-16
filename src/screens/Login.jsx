@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, Alert } from "react-native";
-import { useFonts, Nunito_200ExtraLight, Nunito_300Light, Nunito_800ExtraBold } from "@expo-google-fonts/nunito";
+
 import { useState, useContext, useEffect } from "react";
 
 import firebase from "../firebaseConfig";
@@ -11,21 +11,11 @@ import { LoginContext } from "../context/LoginContext";
 
 const auth = getAuth(firebase);
 
-export default function Login({ navigation }) {
+export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const loginStatus = useContext(LoginContext);
-
-    const [fontLoaded] = useFonts({
-        Nunito_200ExtraLight,
-        Nunito_300Light,
-        Nunito_800ExtraBold
-    });
-
-    if (!fontLoaded) {
-        return null;
-    }
 
     async function getCredential() {
         try {
@@ -34,9 +24,8 @@ export default function Login({ navigation }) {
             await AsyncStorage.setItem("userData", JSON.stringify(user));
 
             loginStatus.updateLogin(true);
-            console.log(loginStatus.login)
         } catch (error) {
-            Alert.alert("Tente novamente!", "O usuário ou senha inseridos, são inválidos.")
+            Alert.alert("Tente novamente!", "O usuário ou senha inseridos, são inválidos.");
         }
     }
 
@@ -61,23 +50,23 @@ export default function Login({ navigation }) {
                 <View style={style.form}>
                     <View style={style.inputView}>
                         <Text style={style.label}>E-mail</Text>
-                        <TextInput style={style.input} keyboardType="email-address" onChangeText={(text) => { setEmail(text) }} />
+                        <TextInput style={style.input} keyboardType="email-address" onChangeText={(text) => { setEmail(text); }} />
                     </View>
 
                     <View style={style.inputView}>
                         <Text style={style.label}>Senha</Text>
-                        <TextInput style={style.input} secureTextEntry={true} onChangeText={(text) => { setPassword(text) }} />
+                        <TextInput style={style.input} secureTextEntry={true} onChangeText={(text) => { setPassword(text); }} />
 
                         <Text style={style.forgotPass} onPress={() => forgotPassword()}>Esqueci minha senha</Text>
                     </View>
 
-                    <TouchableOpacity style={style.button} onPress={() => { getCredential() }}>
+                    <TouchableOpacity style={style.button} onPress={() => { getCredential(); }}>
                         <Text style={style.buttonText}>Entrar</Text>
                     </TouchableOpacity>
                 </View>
             </View>
         </View>
-    )
+    );
 }
 
 
@@ -150,4 +139,4 @@ const style = StyleSheet.create({
         fontSize: 18,
         textAlign: "center"
     }
-})
+});
