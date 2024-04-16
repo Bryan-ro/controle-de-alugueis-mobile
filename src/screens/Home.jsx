@@ -8,16 +8,22 @@ import AddButton from "../components/AddButton";
 import Card from "../components/Card.jsx";
 
 import { LoginContext } from "../context/LoginContext";
+import { LoadingContext } from "../context/LoadingContext.jsx";
 
 const firestore = getFirestore(firebaseConfig);
 
 export default function Home({ navigation }) {
     const { userId } = useContext(LoginContext);
+    const Loading = useContext(LoadingContext);
 
     const [residences, setResidences] = useState([]);
 
     useEffect(() => {
-        getResidences();
+        Loading(true);
+
+        getResidences().finally(() => {
+            Loading(false);
+        });
     }, []);
 
     async function getResidences() {
@@ -31,7 +37,7 @@ export default function Home({ navigation }) {
 
         querySnap.forEach((doc) => {
             const data = doc.data()
-            console.log(data)
+
             state.push(data);
         });
 
@@ -46,13 +52,13 @@ export default function Home({ navigation }) {
             </View>
 
             <View style={style.addDiv}>
-                <AddButton onPress={() => { getResidences() }} />
+                <AddButton onPress={() => { }} />
             </View>
 
             <View style={style.container}>
                 <ScrollView style={style.scroll}>
                     {residences.map((data, index) => (
-                        <Card key={index} source={{ uri: data.photo }} address={data.address} quantTenant={0} />
+                        <Card key={index} source={{ uri: data.photo }} address={`${data.address}, ${data.number}`} quantTenant={0} />
                     ))}
                 </ScrollView>
             </View>

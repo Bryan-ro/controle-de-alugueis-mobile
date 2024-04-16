@@ -1,7 +1,9 @@
 import { StatusBar } from "react-native";
 
 
-import { LoginStatus } from "./src/context/LoginContext";
+import { LoginStatus } from "./src/context/LoginContext.jsx";
+import { Loading } from "./src/context/LoadingContext.jsx";
+
 import Router from "./src/router";
 
 import { useFonts, Nunito_200ExtraLight, Nunito_300Light, Nunito_800ExtraBold } from "@expo-google-fonts/nunito";
@@ -23,8 +25,10 @@ export default function App() {
     }
 
     return (
-        <LoginStatus>
-            <Router />
-        </LoginStatus>
+        <Loading>
+            <LoginStatus>
+                <Router />
+            </LoginStatus>
+        </Loading>
     );
 }

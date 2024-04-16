@@ -8,6 +8,7 @@ import { signInWithEmailAndPassword, getAuth, sendPasswordResetEmail } from "fir
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { LoginContext } from "../context/LoginContext";
+import { LoadingContext } from "../context/LoadingContext";
 
 const auth = getAuth(firebase);
 
@@ -16,8 +17,11 @@ export default function Login() {
     const [password, setPassword] = useState("");
 
     const loginStatus = useContext(LoginContext);
+    const Loading = useContext(LoadingContext);
+
 
     async function getCredential() {
+        Loading(true);
         try {
             const user = await signInWithEmailAndPassword(auth, email, password);
 
@@ -27,6 +31,8 @@ export default function Login() {
         } catch (error) {
             Alert.alert("Tente novamente!", "O usuário ou senha inseridos, são inválidos.");
         }
+
+        Loading(false);
     }
 
     async function forgotPassword() {
