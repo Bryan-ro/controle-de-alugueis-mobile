@@ -24,10 +24,10 @@ export default function Home({ navigation }) {
         getResidences().finally(() => {
             Loading(false);
         });
-    }, []);
+    }, [navigation]);
 
     async function getResidences() {
-        const collectionRef = collection(firestore, "residencias");
+        const collectionRef = collection(firestore, "residences");
 
         const q = query(collectionRef, where("userId", "==", userId))
 

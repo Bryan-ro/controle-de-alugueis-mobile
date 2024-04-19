@@ -1,11 +1,10 @@
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Alert } from "react-native";
 import { useState, useContext } from "react";
 
 
 import firebaseConfig from "../firebaseConfig.js";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
-
-import { v4 as uuid } from "react-native-uuid";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getFirestore, addDoc, collection } from "firebase/firestore";
 
 import AddButton from "../components/AddButton.jsx";
 import { LoginContext } from "../context/LoginContext.jsx";
@@ -13,9 +12,9 @@ import { LoginContext } from "../context/LoginContext.jsx";
 import * as ImagePicker from "expo-image-picker";
 
 export default function AddResidence() {
-    const [address, setAddress] = useState("");
-    const [number, setNumber] = useState("");
-    const [image, setImage] = useState({});
+    const [address, setAddress] = useState(null);
+    const [number, setNumber] = useState(null);
+    const [image, setImage] = useState(null);
 
     const { userId } = useContext(LoginContext);
 
@@ -30,33 +29,58 @@ export default function AddResidence() {
 
         if (!result.canceled) {
             setImage(result.assets[0].uri);
+
+            console.log(result.assets[0]);
         }
 
         return;
     }
 
+    const uploadImageOnFirebaseStorage = async () => {
+        try {
+            const store = getStorage(firebaseConfig);
+
+            const fileName = image.substring(image.lastIndexOf("/") + 1);
+
+            const imageRef = ref(store, `/images/${fileName}`);
+
+            const response = await fetch(image);
+            const blob = await response.blob();
+
+            await uploadBytes(imageRef, blob);
+
+            const imageUrl = await getDownloadURL(imageRef);
+
+            return imageUrl;
+        } catch {
+            Alert.alert("Erro ao realizar Upload de imagem.", "Entre em contato com o suporte.");
+        }
+    }
+
+
+    const createResidenceOnFireStore = async (imageUrl) => {
+        try {
+            const store = getFirestore(firebaseConfig);
+
+            await addDoc(collection(store, "residences"), {
+                address,
+                number,
+                photo: imageUrl,
+                userId
+            });
+        } catch {
+            Alert.alert("Falha ao registrar as informações", "Entre em contato com o suporte.");
+        }
+    }
 
     const addResidence = async () => {
-        const store = getStorage(firebaseConfig);
 
-        const filename = image.substring(image.lastIndex("/") + 1);
-
-        const storeRef = ref(store, filename);
-
-        try {
-            const response = await fetch(image);
-
-            const blob = response.blob();
-
-            const upload = await uploadBytes(storeRef, blob);
-
-            console.log(upload)
-        } catch (e) {
-            console.log(error);
+        if (!image || !address || !number) {
+            return Alert.alert("Erro ao adicionar residência.", "Verifique se todos os campos foram preenchidos.");
         }
 
-
-
+        const imageUrl = await uploadImageOnFirebaseStorage();
+        await createResidenceOnFireStore(imageUrl);
     }
 
     return (
@@ -76,9 +100,11 @@ export default function AddResidence() {
                     <TextInput style={style.input} keyboardType="number-pad" onChangeText={(text) => { setNumber(text) }} />
                 </View>
 
-                <View style={style.inputView}>
-                    <AddButton text="Upload de imagem" onPress={() => { pickImage() }} />
-                </View>
+                <TouchableOpacity style={style.uploadButton} onPress={() => pickImage()}>
+                    <Text style={style.uploadText}>Upload de imagem</Text>
+                    {image && <Image source={{ uri: image }} style={{ width: 200, height: 200, marginVertical: 20 }} />}
+                </TouchableOpacity>
+
 
                 <TouchableOpacity style={style.button} onPress={() => { addResidence() }}>
                     <Text style={style.buttonText}>Adicionar</Text>
@@ -154,5 +180,21 @@ const style = StyleSheet.create({
         color: "white",
         fontSize: 18,
         textAlign: "center"
+    },
+
+    uploadButton: {
+        backgroundColor: "#FFFFFF",
+        height: "auto",
+        width: 200,
+        borderRadius: 30,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 10
+    },
+
+    uploadText: {
+        fontFamily: "Nunito_800ExtraBold",
+        fontSize: 16
     }
 })
