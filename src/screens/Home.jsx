@@ -52,7 +52,7 @@ export default function Home({ navigation }) {
             </View>
 
             <View style={style.addDiv}>
-                <AddButton onPress={() => { }} />
+                <AddButton onPress={() => { navigation.navigate("AddResidence") }} addIcon={true} />
             </View>
 
             <View style={style.container}>
