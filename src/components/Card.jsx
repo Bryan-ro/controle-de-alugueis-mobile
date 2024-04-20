@@ -1,17 +1,19 @@
-import { Text, Image, View, StyleSheet } from "react-native";
+import { Text, Image, TouchableOpacity, View, StyleSheet } from "react-native";
 
 export default function Card(props) {
     return (
-        <View style={style.card}>
-            <View style={style.cardImage}>
-                <Image style={{ width: "100%", height: "100%", borderTopLeftRadius: 15, borderTopRightRadius: 15 }} source={props.source} />
-            </View>
+        <View>
+            <TouchableOpacity style={style.card} onPress={props.onPress}>
+                <View style={style.cardImage}>
+                    <Image style={{ width: "100%", height: "100%", borderTopLeftRadius: 15, borderTopRightRadius: 15 }} source={props.source} />
+                </View>
 
-            <View style={style.cardTextView}>
-                <Text style={style.cardText}>{props.address}</Text>
+                <View style={style.cardTextView}>
+                    <Text style={style.cardText}>{props.address}</Text>
 
-                <Text style={style.cardSubText}>Inquilinos: <Text>{props.quantTenant}</Text></Text>
-            </View>
+                    <Text style={style.cardSubText}>Inquilinos: <Text>{props.quantTenant}</Text></Text>
+                </View>
+            </TouchableOpacity>
         </View>
     );
 }

@@ -6,17 +6,18 @@ import firebaseConfig from "../firebaseConfig.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getFirestore, addDoc, collection } from "firebase/firestore";
 
-import AddButton from "../components/AddButton.jsx";
 import { LoginContext } from "../context/LoginContext.jsx";
+import { LoadingContext } from "../context/LoadingContext.jsx";
 
 import * as ImagePicker from "expo-image-picker";
 
-export default function AddResidence() {
+export default function AddResidence({ navigation }) {
     const [address, setAddress] = useState(null);
     const [number, setNumber] = useState(null);
     const [image, setImage] = useState(null);
 
     const { userId } = useContext(LoginContext);
+    const Loading = useContext(LoadingContext);
 
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -74,6 +75,7 @@ export default function AddResidence() {
     }
 
     const addResidence = async () => {
+        Loading(true);
 
         if (!image || !address || !number) {
             return Alert.alert("Erro ao adicionar residência.", "Verifique se todos os campos foram preenchidos.");
@@ -81,6 +83,9 @@ export default function AddResidence() {
 
         const imageUrl = await uploadImageOnFirebaseStorage();
         await createResidenceOnFireStore(imageUrl);
+
+        Loading(false);
+        navigation.navigate("Home");
     }
 
     return (

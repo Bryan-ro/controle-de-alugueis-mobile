@@ -1,6 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { Text, View, StyleSheet, ScrollView } from "react-native";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import firebaseConfig from "../firebaseConfig";
 import { collection, query, getDocs, getFirestore, where } from "firebase/firestore";
 
@@ -18,13 +20,13 @@ export default function Home({ navigation }) {
 
     const [residences, setResidences] = useState([]);
 
-    useEffect(() => {
+    navigation.addListener('focus', () => {
         Loading(true);
 
         getResidences().finally(() => {
             Loading(false);
         });
-    }, [navigation]);
+    });
 
     async function getResidences() {
         const collectionRef = collection(firestore, "residences");
@@ -38,7 +40,7 @@ export default function Home({ navigation }) {
         querySnap.forEach((doc) => {
             const data = doc.data()
 
-            state.push(data);
+            state.push({ ...data, residenceId: doc.id });
         });
 
         setResidences(state);
@@ -58,7 +60,7 @@ export default function Home({ navigation }) {
             <View style={style.container}>
                 <ScrollView style={style.scroll}>
                     {residences.map((data, index) => (
-                        <Card key={index} source={{ uri: data.photo }} address={`${data.address}, ${data.number}`} quantTenant={0} />
+                        <Card key={index} source={{ uri: data.photo }} address={`${data.address}, ${data.number}`} quantTenant={0} onPress={() => { navigation.navigate("Residence", { residenceId: data.residenceId }) }} />
                     ))}
                 </ScrollView>
             </View>

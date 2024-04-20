@@ -8,11 +8,6 @@ export function Loading({ children }) {
     const spinValue = new Animated.Value(0);
 
     useEffect(() => {
-        const spin = spinValue.interpolate({
-            inputRange: [0, 1],
-            outputRange: ['0deg', '360deg']
-        });
-
         const animation = Animated.loop(
             Animated.timing(
                 spinValue,
@@ -25,8 +20,16 @@ export function Loading({ children }) {
             )
         );
 
-        animation.start();
-    }, []);
+        if (loading) {
+            animation.start();
+        } else {
+            animation.stop();
+        }
+
+        return () => {
+            animation.stop();
+        };
+    }, [loading]);
 
     const updateLoading = (status) => {
         setLoading(status);
@@ -43,7 +46,6 @@ export function Loading({ children }) {
                     width: "100%",
                     height: "100%",
                     zIndex: 3,
-
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center"
@@ -56,7 +58,6 @@ export function Loading({ children }) {
                                     outputRange: ['0deg', '360deg']
                                 })
                             }],
-
                             borderColor: "white",
                             borderRightWidth: 10,
                             borderLeftWidth: 10,
