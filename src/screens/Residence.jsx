@@ -6,6 +6,7 @@ export default function Residence({ route, navigation }) {
     console.log(residenceId);
     return (
         <View>
+
         </View>
     )
 }
