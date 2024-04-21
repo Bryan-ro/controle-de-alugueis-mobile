@@ -6,7 +6,7 @@ import { Loading } from "./src/context/LoadingContext.jsx";
 
 import Router from "./src/router";
 
-import { useFonts, Nunito_200ExtraLight, Nunito_300Light, Nunito_800ExtraBold } from "@expo-google-fonts/nunito";
+import { useFonts, Nunito_200ExtraLight, Nunito_300Light, Nunito_800ExtraBold, Nunito_400Regular_Italic } from "@expo-google-fonts/nunito";
 
 StatusBar.popStackEntry({
     barStyle: "default",
@@ -17,7 +17,8 @@ export default function App() {
     const [fontLoaded] = useFonts({
         Nunito_200ExtraLight,
         Nunito_300Light,
-        Nunito_800ExtraBold
+        Nunito_800ExtraBold,
+        Nunito_400Regular_Italic
     });
 
     if (!fontLoaded) {

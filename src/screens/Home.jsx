@@ -20,6 +20,14 @@ export default function Home({ navigation }) {
 
     const [residences, setResidences] = useState([]);
 
+    useEffect(() => {
+        Loading(true);
+
+        getResidences().finally(() => {
+            Loading(false);
+        });
+    }, [])
+
     navigation.addListener('focus', () => {
         Loading(true);
 
@@ -30,21 +38,23 @@ export default function Home({ navigation }) {
 
     async function getResidences() {
         const collectionRef = collection(firestore, "residences");
-
-        const q = query(collectionRef, where("userId", "==", userId))
-
+        const q = query(collectionRef, where("userId", "==", userId));
         const querySnap = await getDocs(q);
 
-        const state = [];
+        const promises = querySnap.docs.map(async (doc) => {
+            const data = doc.data();
 
-        querySnap.forEach((doc) => {
-            const data = doc.data()
+            const tenantsCollectionRef = collection(firestore, "tenants");
+            const qTenant = query(tenantsCollectionRef, where("residenceId", "==", doc.id));
+            const tenantsSnap = await getDocs(qTenant);
 
-            state.push({ ...data, residenceId: doc.id });
+            return { ...data, residenceId: doc.id, tenantsQuantity: tenantsSnap.size };
         });
 
-        setResidences(state);
+        const residences = await Promise.all(promises);
+        setResidences(residences);
     }
+
 
 
     return (
@@ -60,7 +70,7 @@ export default function Home({ navigation }) {
             <View style={style.container}>
                 <ScrollView style={style.scroll}>
                     {residences.map((data, index) => (
-                        <Card key={index} source={{ uri: data.photo }} address={`${data.address}, ${data.number}`} quantTenant={0} onPress={() => { navigation.navigate("Residence", { residenceId: data.residenceId }) }} />
+                        <Card key={index} source={{ uri: data.photo }} address={`${data.address}, ${data.number}`} quantTenant={data.tenantsQuantity} onPress={() => { navigation.navigate("Residence", { residenceId: data.residenceId }) }} />
                     ))}
                 </ScrollView>
             </View>
