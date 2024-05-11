@@ -1,10 +1,27 @@
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
-import AddButton from "../components/AddButton.jsx"
+import AddButton from "../components/AddButton.jsx";
+
+import firebaseConfig from "../firebaseConfig.js";
+
+import { collection, query, getDocs, getFirestore, where } from "firebase/firestore";
 
 export default function Residence({ route, navigation }) {
     const { residenceId } = route.params;
 
-    let price = 1200;
+    const price = 1000
+
+    async function teste() {
+        const firestore = getFirestore(firebaseConfig);
+        const collectionRef = collection(firestore, "tenants");
+        const q = query(collectionRef, where("residenceId", "==", residenceId));
+        const querySnap = await getDocs(q);
+
+        querySnap.docs.map(async doc => {
+            console.log(doc.data())
+        })
+    }
+
+    teste()
 
     return (
         <View style={style.background}>
@@ -13,7 +30,7 @@ export default function Residence({ route, navigation }) {
             </View>
 
             <View style={style.addDiv}>
-                <AddButton onPress={() => { navigation.navigate("#") }} addIcon={true} />
+                <AddButton onPress={() => { navigation.navigate("AddTenant", { residenceId }) }} addIcon={true} />
             </View>
 
             <View style={style.container}>

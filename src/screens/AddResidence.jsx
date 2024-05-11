@@ -121,8 +121,6 @@ export default function AddResidence({ navigation }) {
 }
 
 
-
-
 const style = StyleSheet.create({
     background: {
         backgroundColor: "#102C57",
