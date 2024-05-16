@@ -23,11 +23,15 @@ export default function AddTenant({ route, navigation }) {
         try {
             const store = getFirestore(firebaseConfig);
 
+            const date = new Date()
+            /* Reset Hours */ date.setHours(0, 0, 0, 0);
+
             await addDoc(collection(store, "tenants"), {
                 name,
                 rentValue,
                 dueDate,
-                residenceId
+                residenceId,
+                lastPayment: date
             });
 
             Loading(false);
