@@ -1,7 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Text, View, StyleSheet, ScrollView } from "react-native";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Text, View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 
 import firebaseConfig from "../firebaseConfig";
 import { collection, query, getDocs, getFirestore, where } from "firebase/firestore";
@@ -20,13 +18,13 @@ export default function Home({ navigation }) {
 
     const [residences, setResidences] = useState([]);
 
-    useEffect(() => {
-        Loading(true);
+    // useEffect(() => {
+    //     Loading(true);
 
-        getResidences().finally(() => {
-            Loading(false);
-        });
-    }, [])
+    //     getResidences().finally(() => {
+    //         Loading(false);
+    //     });
+    // }, []);
 
     navigation.addListener('focus', () => {
         Loading(true);
@@ -64,7 +62,7 @@ export default function Home({ navigation }) {
             </View>
 
             <View style={style.addDiv}>
-                <AddButton onPress={() => { navigation.navigate("AddResidence") }} addIcon={true} />
+                <AddButton onPress={() => { navigation.replace("AddResidence") }} addIcon={true} />
             </View>
 
             <View style={style.container}>
@@ -73,6 +71,12 @@ export default function Home({ navigation }) {
                         <Card key={index} source={{ uri: data.photo }} address={`${data.address}, ${data.number}`} quantTenant={data.tenantsQuantity} onPress={() => { navigation.navigate("Residence", { residenceId: data.residenceId }) }} />
                     ))}
                 </ScrollView>
+            </View>
+
+            <View style={style.container}>
+                <TouchableOpacity style={style.logout}>
+                    <Text>Logout</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -103,7 +107,7 @@ const style = StyleSheet.create({
 
     container: {
         width: "100%",
-        height: "80%",
+        height: "75%",
 
         display: "flex",
         alignItems: "center"
@@ -111,5 +115,15 @@ const style = StyleSheet.create({
 
     scroll: {
         width: "85%",
+    },
+
+    logout: {
+        width: "80%",
+        height: 25,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 30,
+        backgroundColor: "#ff6759",
     }
 });

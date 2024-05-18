@@ -85,7 +85,7 @@ export default function AddResidence({ navigation }) {
         await createResidenceOnFireStore(imageUrl);
 
         Loading(false);
-        navigation.navigate("Home");
+        navigation.goBack();
     }
 
     return (

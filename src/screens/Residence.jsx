@@ -1,18 +1,23 @@
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image } from "react-native";
 import AddButton from "../components/AddButton.jsx";
 
 import firebaseConfig from "../firebaseConfig.js";
 
-import { collection, query, getDocs, getFirestore, where, Timestamp } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { collection, query, getDocs, getFirestore, where } from "firebase/firestore";
+import { useContext, useEffect, useState } from "react";
+
+import { LoadingContext } from "../context/LoadingContext.jsx";
 
 export default function Residence({ route, navigation }) {
     const { residenceId } = route.params;
+    const Loading = useContext(LoadingContext);
 
     const [tenants, setTenants] = useState([]);
 
     useEffect(() => {
         async function renderTenants() {
+            Loading(true)
+
             const firestore = getFirestore(firebaseConfig);
             const collectionRef = collection(firestore, "tenants");
             const q = query(collectionRef, where("residenceId", "==", residenceId));
@@ -25,6 +30,8 @@ export default function Residence({ route, navigation }) {
             const tenants = await Promise.all(data);
 
             setTenants(tenants);
+
+            Loading(false)
         }
 
         renderTenants();
@@ -38,6 +45,10 @@ export default function Residence({ route, navigation }) {
 
             <View style={style.addDiv}>
                 <AddButton onPress={() => { navigation.navigate("AddTenant", { residenceId }) }} addIcon={true} />
+
+                <TouchableOpacity>
+                    <Image style={style.deleteIcon} source={require("../public/deleteIcon.png")} />
+                </TouchableOpacity>
             </View>
 
             <View style={style.container}>
@@ -94,7 +105,15 @@ const style = StyleSheet.create({
     },
 
     addDiv: {
-        padding: 15
+        padding: 15,
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between"
+    },
+
+    deleteIcon: {
+        width: 35,
+        height: 35
     },
 
     container: {
