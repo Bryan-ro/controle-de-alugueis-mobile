@@ -25,9 +25,7 @@ export default function Login() {
         try {
             const user = await signInWithEmailAndPassword(auth, email, password);
 
-            await AsyncStorage.setItem("userData", JSON.stringify(user));
-
-            loginStatus.updateLogin(true);
+            await AsyncStorage.setItem("userData", JSON.stringify(user)).finally(() => loginStatus.updateLogin(true));
         } catch (error) {
             Alert.alert("Tente novamente!", "O usuário ou senha inseridos, são inválidos.");
         }

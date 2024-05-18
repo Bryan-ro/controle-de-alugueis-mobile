@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, Alert } from "react-native";
 import AddButton from "../components/AddButton.jsx";
 
 import firebaseConfig from "../firebaseConfig.js";
@@ -14,11 +14,12 @@ export default function Residence({ route, navigation }) {
 
     const [tenants, setTenants] = useState([]);
 
+    const firestore = getFirestore(firebaseConfig);
+
     useEffect(() => {
         async function renderTenants() {
             Loading(true)
 
-            const firestore = getFirestore(firebaseConfig);
             const collectionRef = collection(firestore, "tenants");
             const q = query(collectionRef, where("residenceId", "==", residenceId));
             const querySnap = await getDocs(q);
@@ -37,6 +38,21 @@ export default function Residence({ route, navigation }) {
         renderTenants();
     }, []);
 
+
+    function deleteResidence() {
+        Alert.alert("Deseja mesmo realizar está operação?", "Todos os inquilinos desta residencia e a residência serão excluidos permanentementes. ", [
+            {
+                text: 'Cancel',
+                onPress: () => console.log('Prompt canceled'),
+                style: 'cancel',
+            },
+            {
+                text: 'OK',
+                onPress: () => console.log('Submitted value:'),
+            },
+        ])
+    }
+
     return (
         <View style={style.background}>
             <View style={style.titleView}>
@@ -46,7 +62,7 @@ export default function Residence({ route, navigation }) {
             <View style={style.addDiv}>
                 <AddButton onPress={() => { navigation.navigate("AddTenant", { residenceId }) }} addIcon={true} />
 
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => deleteResidence()}>
                     <Image style={style.deleteIcon} source={require("../public/deleteIcon.png")} />
                 </TouchableOpacity>
             </View>
@@ -74,7 +90,7 @@ export default function Residence({ route, navigation }) {
                                 onPress={() => { }} >
                                 <Text style={style.cardText}>Inquilino: {data.name}</Text>
                                 <Text style={style.cardSecundaryText}>Valor do alguel: {data.rentValue.toLocaleString("pt-BR", { currency: "BRL", style: "currency" })}</Text>
-                                <Text style={style.cardSecundaryText}>{currentDate < date ? "Próximo pagamento" : "Pagamento atrasado:"}: {formattedDate}</Text>
+                                <Text style={style.cardSecundaryText}>{currentDate < date ? "Próximo pagamento" : "Pagamento atrasado"}: {formattedDate}</Text>
                             </TouchableOpacity>
                         )
                     })}

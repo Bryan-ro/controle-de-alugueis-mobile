@@ -28,7 +28,7 @@ export default function AddTenant({ route, navigation }) {
 
             await addDoc(collection(store, "tenants"), {
                 name,
-                rentValue,
+                rentValue: Number(rentValue),
                 dueDate,
                 residenceId,
                 lastPayment: date

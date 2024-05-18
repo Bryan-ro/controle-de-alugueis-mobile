@@ -20,6 +20,8 @@ export function LoginStatus({ children }) {
 
                         if (user) {
                             setLogin(true);
+                        } else {
+                            setLogin(false);
                         }
                     } catch {
                         setLogin(false);
@@ -34,10 +36,16 @@ export function LoginStatus({ children }) {
         const setIntervalId = setInterval(getUser, 30000);
 
         return () => clearInterval(setIntervalId);
-    }, []);
+    }, [login]);
 
     function updateLogin(login) {
         setLogin(login);
+    }
+
+    async function logout() {
+        setLogin(false);
+
+        await AsyncStorage.clear();
     }
 
 
@@ -45,7 +53,8 @@ export function LoginStatus({ children }) {
         userId,
         email,
         login,
-        updateLogin
+        updateLogin,
+        logout
     };
 
     return <LoginContext.Provider value={userContextValue}>{!login ? <Login /> : children}</LoginContext.Provider>

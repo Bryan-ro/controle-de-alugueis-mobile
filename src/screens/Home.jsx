@@ -13,26 +13,30 @@ import { LoadingContext } from "../context/LoadingContext.jsx";
 const firestore = getFirestore(firebaseConfig);
 
 export default function Home({ navigation }) {
-    const { userId } = useContext(LoginContext);
+    const { userId, logout, login } = useContext(LoginContext);
     const Loading = useContext(LoadingContext);
 
-    const [residences, setResidences] = useState([]);
+    const [residences, setResidences] = useState(null);
 
-    // useEffect(() => {
-    //     Loading(true);
-
-    //     getResidences().finally(() => {
-    //         Loading(false);
-    //     });
-    // }, []);
-
-    navigation.addListener('focus', () => {
+    function renderResidences() {
         Loading(true);
 
         getResidences().finally(() => {
             Loading(false);
         });
+    }
+
+    useEffect(() => {
+        renderResidences();
+    }, []);
+
+    navigation.addListener('focus', () => {
+        renderResidences();
     });
+
+    function reload() {
+        renderResidences();
+    }
 
     async function getResidences() {
         const collectionRef = collection(firestore, "residences");
@@ -62,19 +66,19 @@ export default function Home({ navigation }) {
             </View>
 
             <View style={style.addDiv}>
-                <AddButton onPress={() => { navigation.replace("AddResidence") }} addIcon={true} />
+                <AddButton onPress={() => { navigation.navigate("AddResidence") }} addIcon={true} />
             </View>
 
             <View style={style.container}>
                 <ScrollView style={style.scroll}>
-                    {residences.map((data, index) => (
-                        <Card key={index} source={{ uri: data.photo }} address={`${data.address}, ${data.number}`} quantTenant={data.tenantsQuantity} onPress={() => { navigation.navigate("Residence", { residenceId: data.residenceId }) }} />
-                    ))}
+                    {!residences ? reload() : residences.map((data, index) => {
+                        return <Card key={index} source={{ uri: data.photo }} address={`${data.address}, ${data.number}`} quantTenant={data.tenantsQuantity} onPress={() => { navigation.navigate("Residence", { residenceId: data.residenceId }) }} />
+                    })}
                 </ScrollView>
             </View>
 
             <View style={style.container}>
-                <TouchableOpacity style={style.logout}>
+                <TouchableOpacity style={style.logout} onPress={() => { logout() }}>
                     <Text>Logout</Text>
                 </TouchableOpacity>
             </View>
