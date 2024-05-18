@@ -42,18 +42,28 @@ export default function Residence({ route, navigation }) {
 
             <View style={style.container}>
                 <ScrollView style={style.scroll}>
-                    {tenants.map(data => {
+                    {tenants.map((data, index) => {
                         const date = new Date(data.lastPayment.seconds * 1000 + data.lastPayment.nanoseconds / 1000000);
                         /*Next payment month */ date.setMonth(date.getMonth() + 1);
                         /*Next payment day */ date.setDate(date.getDay() - date.getDay() + data.dueDate);
 
                         const formattedDate = date.toLocaleString("pt-BR", { dateStyle: "short" });
 
+                        const currentDate = new Date();
+
                         return (
-                            <TouchableOpacity style={style.card} onPress={() => { }}>
+                            <TouchableOpacity
+                                key={index}
+                                style={
+                                    {
+                                        ...style.card,
+                                        borderColor: currentDate < date ? "#344be0" : "red"
+                                    }
+                                }
+                                onPress={() => { }} >
                                 <Text style={style.cardText}>Inquilino: {data.name}</Text>
                                 <Text style={style.cardSecundaryText}>Valor do alguel: {data.rentValue.toLocaleString("pt-BR", { currency: "BRL", style: "currency" })}</Text>
-                                <Text style={style.cardSecundaryText}>Próximo pagamento: {formattedDate}</Text>
+                                <Text style={style.cardSecundaryText}>{currentDate < date ? "Próximo pagamento" : "Pagamento atrasado:"}: {formattedDate}</Text>
                             </TouchableOpacity>
                         )
                     })}
@@ -107,7 +117,6 @@ const style = StyleSheet.create({
         padding: 10,
 
         borderLeftWidth: 10,
-        borderColor: "#344be0",
 
         marginVertical: 5
     },
