@@ -3,7 +3,7 @@ import AddButton from "../components/AddButton.jsx";
 
 import firebaseConfig from "../firebaseConfig.js";
 
-import { collection, query, getDocs, getFirestore, where } from "firebase/firestore";
+import { collection, query, getDocs, getFirestore, where, doc, deleteDoc } from "firebase/firestore";
 import { useContext, useEffect, useState } from "react";
 
 import { LoadingContext } from "../context/LoadingContext.jsx";
@@ -40,15 +40,31 @@ export default function Residence({ route, navigation }) {
 
 
     function deleteResidence() {
+        const deleteResidence = async () => {
+            const docRef = doc(firestore, "residences", residenceId);
+
+            await deleteDoc(docRef);
+
+
+            const collectionRef = collection(firestore, "tenants");
+            const q = query(collectionRef, where("residenceId", "==", residenceId));
+            const querySnap = await getDocs(q);
+
+            const deleteTenants = querySnap.docs.map(docSnapshot => deleteDoc(docSnapshot.ref));
+
+            await Promise.all(deleteTenants);
+
+            navigation.goBack();
+        }
+
         Alert.alert("Deseja mesmo realizar está operação?", "Todos os inquilinos desta residencia e a residência serão excluidos permanentementes. ", [
             {
                 text: 'Cancel',
-                onPress: () => console.log('Prompt canceled'),
                 style: 'cancel',
             },
             {
-                text: 'OK',
-                onPress: () => console.log('Submitted value:'),
+                text: 'Excluir',
+                onPress: () => deleteResidence(),
             },
         ])
     }

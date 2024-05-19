@@ -13,7 +13,7 @@ import { LoadingContext } from "../context/LoadingContext.jsx";
 const firestore = getFirestore(firebaseConfig);
 
 export default function Home({ navigation }) {
-    const { userId, logout, login } = useContext(LoginContext);
+    const { userId, logout } = useContext(LoginContext);
     const Loading = useContext(LoadingContext);
 
     const [residences, setResidences] = useState(null);
@@ -35,7 +35,7 @@ export default function Home({ navigation }) {
     });
 
     function reload() {
-        renderResidences();
+        getResidences()
     }
 
     async function getResidences() {
