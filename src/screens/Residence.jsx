@@ -25,7 +25,10 @@ export default function Residence({ route, navigation }) {
             const querySnap = await getDocs(q);
 
             const data = querySnap.docs.map(async doc => {
-                return doc.data();
+                return {
+                    ...doc.data(),
+                    id: doc.id
+                };
             })
 
             const tenants = await Promise.all(data);
@@ -103,7 +106,7 @@ export default function Residence({ route, navigation }) {
                                         borderColor: currentDate < date ? "#344be0" : "red"
                                     }
                                 }
-                                onPress={() => { }} >
+                                onPress={() => { navigation.navigate("Tenant", { ...data, nextPayment: formattedDate }) }} >
                                 <Text style={style.cardText}>Inquilino: {data.name}</Text>
                                 <Text style={style.cardSecundaryText}>Valor do alguel: {data.rentValue.toLocaleString("pt-BR", { currency: "BRL", style: "currency" })}</Text>
                                 <Text style={style.cardSecundaryText}>{currentDate < date ? "Próximo pagamento" : "Pagamento atrasado"}: {formattedDate}</Text>

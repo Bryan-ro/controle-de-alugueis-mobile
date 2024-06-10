@@ -7,6 +7,7 @@ import Home from './screens/Home';
 import AddResidence from "./screens/AddResidence";
 import Residence from "./screens/Residence";
 import AddTenant from "./screens/AddTenant";
+import Tenant from "./screens/Tenant";
 
 const Stack = createStackNavigator();
 
@@ -18,6 +19,7 @@ export default function Router() {
                 <Stack.Screen name="AddResidence" component={AddResidence} />
                 <Stack.Screen name="Residence" component={Residence} />
                 <Stack.Screen name="AddTenant" component={AddTenant}></Stack.Screen>
+                <Stack.Screen name="Tenant" component={Tenant}></Stack.Screen>
             </Stack.Navigator>
         </NavigationContainer>
     );
